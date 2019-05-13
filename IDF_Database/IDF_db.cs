@@ -9,7 +9,8 @@ namespace IDF_Database
     {
         List<IDF> idfs;
         const string SaveFileName = @"SavedData/IDFs.bin";
-        string fallBackFileName;
+        string fallBackFileName = @"SavedData/" + DateTime.Now.ToString("_MM-dd-yyyy_HHmm") + ".bin";
+        bool customFallbackName = false;
         Stream stream;
         BinaryFormatter bf;
 
@@ -60,10 +61,15 @@ namespace IDF_Database
             idfs.Add(idf);
         }
 
+        public void changeFallbackName(string name)
+        {
+            customFallbackName = true;
+            fallBackFileName = @"SavedData/" + name + ".bin";
+        }
+
         public void saveIDFs()
         {
-            fallBackFileName = @"SavedData/" + DateTime.Now.ToString("_MM-dd-yyyy_HHmm") + ".bin";
-
+            
             stream = File.Open(SaveFileName, FileMode.Create);
             bf = new BinaryFormatter();
             bf.Serialize(stream, idfs);
@@ -158,6 +164,8 @@ namespace IDF_Database
 
             return allIdfNames.ToArray();
         }
+
+        
 
         public bool fallBackData(string file)
         {

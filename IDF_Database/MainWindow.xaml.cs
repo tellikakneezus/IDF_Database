@@ -21,9 +21,9 @@ namespace IDF_Database
         IDF_db idfDB;
 
         enum TutorialStep { Start, Fallback, Spreadsheet, End }; //used to track where user is in tutorial.
-        bool tutorialFlag = false; //set when user chooses tutorial option. 
-
-        Thread splashThread; 
+        bool tutorialFlag = true; //set when user chooses tutorial option. 
+        
+        //Thread splashThread; 
         //BackgroundWorker bgw;
         
 
@@ -39,7 +39,7 @@ namespace IDF_Database
             initializeFM_IdfDB();
             InitializeComponent();
             enableMenu();
-           
+            Tutorial(TutorialStep.Start);
             //splashThread.Abort();
             
         }
@@ -123,6 +123,12 @@ namespace IDF_Database
 
         }
 
+        private void SaveEventButton_Click(object sender, RoutedEventArgs e)
+        {
+            idfDB.changeFallbackName(custFallbackNameTextBox.Text);
+            custFallbackNameTextBox.Text = "Success";
+        }
+
         private void FallbackButton_Click(object sender, RoutedEventArgs e)
         {
             Timer timer = new Timer();
@@ -194,7 +200,9 @@ namespace IDF_Database
                 {
                     case TutorialStep.Start:
                         tutLabel.Visibility = Visibility.Visible;
-                        tutLabel.Content = "Welcome to IDF Database. Start by clicking File-> Save IDF File";
+                        tutLabel.Content = "Welcome to IDF Database. \n\nIf you already know where open ports are: \nCreate a label spreadsheet with the 'N' Column showing the ports that you chose.\n" +
+                            "An example of a port would be '02n02s38'.\n\n Go ahead and place your label spreadsheet in the labels folder of this program and then close out \n\nIf you do not know where open ports are you can save a spreadsheet of all ports by clicking: File-> Save IDF File" +
+                            "\n\nNotice the text box on the bottom of the screen. This text box is used to create a custom fallback marker for the future.";
                         nextButton.Visibility = Visibility.Hidden;
                         break;
                     case TutorialStep.Spreadsheet:
@@ -227,5 +235,7 @@ namespace IDF_Database
             tutorialFlag = true;
             Tutorial(TutorialStep.Start);
         }
+
+       
     }
 }

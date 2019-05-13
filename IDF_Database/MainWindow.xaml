@@ -46,6 +46,8 @@
         <Label x:Name="statusLabel" Content="" HorizontalAlignment="Left" Margin="225,-1,0,0" VerticalAlignment="Top" Width="567"/>
         <Label x:Name="tutLabel" Content="Label" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
         <Button x:Name="nextButton" Content="Next" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" Width="75" Click="NextButton_Click" Visibility="Hidden"/>
+        <TextBox x:Name="custFallbackNameTextBox" HorizontalAlignment="Left" Height="23" Margin="10,380,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="273" RenderTransformOrigin="0.41,0.696"/>
+        <Button x:Name="SaveEventButton" Content="Save Event" HorizontalAlignment="Left" Margin="304,380,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="SaveEventButton_Click"/>
 
 
 
