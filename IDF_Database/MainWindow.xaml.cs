@@ -23,16 +23,13 @@ namespace IDF_Database
         enum TutorialStep { Start, Fallback, Spreadsheet, End }; //used to track where user is in tutorial.
         bool tutorialFlag = true; //set when user chooses tutorial option. 
         
-        //Thread splashThread; 
-        //BackgroundWorker bgw;
+  
         
 
         public MainWindow()
         {
             
-            // REASON COMMENTED OUT SPLASH: SHOWS SPLASH FOR HALF A SEC AND THEN LOADS MAIN 3 SECS AFTER BEHIND ALL OTHER WINDOWS.
-            //splashThread = new Thread(new ThreadStart(Splash));
-            //splashThread.Start();
+         
 
             
             
@@ -40,16 +37,11 @@ namespace IDF_Database
             InitializeComponent();
             enableMenu();
             Tutorial(TutorialStep.Start);
-            //splashThread.Abort();
+       
             
         }
 
-        //void Splash()
-        //{
-        //    SplashScreen.SplashForm frm = new SplashScreen.SplashForm();
-        //    frm.AppName = "IDF DB";
-        //    frm.Show();
-        //}
+        
 
         private void MainForm_Closing(object sender, CancelEventArgs e)
         {

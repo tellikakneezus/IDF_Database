@@ -10,7 +10,7 @@ namespace IDF_Database
         List<IDF> idfs;
         const string SaveFileName = @"SavedData/IDFs.bin";
         string fallBackFileName = @"SavedData/" + DateTime.Now.ToString("_MM-dd-yyyy_HHmm") + ".bin";
-        bool customFallbackName = false;
+
         Stream stream;
         BinaryFormatter bf;
 
@@ -63,7 +63,6 @@ namespace IDF_Database
 
         public void changeFallbackName(string name)
         {
-            customFallbackName = true;
             fallBackFileName = @"SavedData/" + name + ".bin";
         }
 
