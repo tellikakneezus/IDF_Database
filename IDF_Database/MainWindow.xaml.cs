@@ -2,9 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Timers;
 using System.Windows;
-using System.Threading;
 using Timer = System.Timers.Timer;
 using System.ComponentModel;
 
@@ -27,21 +25,12 @@ namespace IDF_Database
         
 
         public MainWindow()
-        {
-            
-         
-
-            
-            
+        {            
             initializeFM_IdfDB();
             InitializeComponent();
             enableMenu();
-            Tutorial(TutorialStep.Start);
-       
-            
+            Tutorial(TutorialStep.Start);                   
         }
-
-        
 
         private void MainForm_Closing(object sender, CancelEventArgs e)
         {

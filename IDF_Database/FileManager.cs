@@ -20,34 +20,30 @@ namespace IDF_Database
         string[][] dataIn; //
         string[,] cableInv;
 
-        const string cableInvFilePath = "@SavedData/CableInventory/CableInventory.xlsx";
+        //Need to figure out how to get this to work
+        //const string cableInvFilePath = @"CableInventory\Cables.xlsx";
 
          
         /**
-         * At creation of FileManager object and excel application is created and any files not processed yet will be processed. 
+         * Creation of FileManager object and Excel application and any files not processed yet will be processed. 
          * */
         public FileManager()
         {
-            excel = new _Excel.Application();
-            dataIn = importData();
+            excel = new _Excel.Application(); //start excel
+
+            string[] labelFiles = getFileNames("Labels"); //
+            dataIn = processFiles(labelFiles);
+            cleanExcelProcess();
+            excel.Quit();
+            filesRead(labelFiles);
+
+            openCableInventoryExcel();
+            cableInv = createCableInvArray();
+            updateCableInv(dataIn);
+            cleanExcelProcess();
+            
         }
 
-        /**
-         * import data will take in every file in labels directory process them and then place them in the Read folder.
-         * Processing includes: taking in any line in the label spreadsheet that contains a IDF cable and placing it in the data 2d string array
-         * 
-         *  
-         * */
-        private string[][] importData()
-        {
-            string[][] data = new string[0][];
-            string[] fileNames = getFileNames();
-            data = processFiles(fileNames); 
-
-            filesRead(fileNames);
-            return data;
-
-        }
 
 
         /**
@@ -56,40 +52,41 @@ namespace IDF_Database
         private string[][] processFiles(string[] fileNames)
         {
             List<string[]> dataList = new List<string[]>();
-            foreach(string file in fileNames)
-            {
+            FileInfo fi;
 
-                FileInfo fi;
+            foreach (string file in fileNames)
+            {
                 fi = new FileInfo(file);
                 openWorkbook(fi.FullName);
                 ws = wb.ActiveSheet;
                 range = ws.UsedRange;
-                
-                //read worksheet cell by cell and input data into dataList. 
-                int numRows = range.Rows.Count;
-                for (int i = 1; i <= numRows; i++)
-                {
-                    if (range.Cells[i, 2].Value2 != null) {
-                        string[] line = new string[range.Columns.Count];
-                        for (int j = 1; j <= line.Length; j++)
-                        {
-                            if (range.Cells[i, j].Value2 != null)
-                            {
-                                line[j - 1] = range.Cells[i, j].Value2.ToString();
-                            }
-                        }
-                        dataList.Add(line);
-                    }
-                }
-                
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                Marshal.ReleaseComObject(range);
-                
-                Marshal.ReleaseComObject(ws);
-                wb.Close();
-                Marshal.ReleaseComObject(wb);
 
+                //read worksheet cell by cell and input data into dataList. 
+                //i and j start at 1 because Cells do not start at 0,0 they start at 1,1 in Excel
+
+                int numRows = range.Rows.Count;
+                int numCols = range.Columns.Count;
+                object[,] importArray = range.Cells.Value2;
+                for(int i = 1; i <= numRows; i++)
+                {
+                    if(importArray[i,1] == null && importArray[i,2] == null)
+                    {
+                        break;
+                    }
+                    string[] objToStringLine = new string[numCols];
+                    for(int j = 0; j < numCols; j++)
+                    {
+                        if (importArray[i, j + 1] != null) objToStringLine[j] = importArray[i, j + 1].ToString(); else objToStringLine[j] = "";
+                    }
+                    dataList.Add(objToStringLine);
+                }
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
+                //Marshal.ReleaseComObject(range);
+
+                //Marshal.ReleaseComObject(ws);
+                //wb.Close();
+                //Marshal.ReleaseComObject(wb);
             }
             
            
@@ -99,7 +96,7 @@ namespace IDF_Database
         /**
          * Created to handle the spreadsheet being open when user tries to start program
          * */
-         private void openWorkbook(string filename)
+        private void openWorkbook(string filename)
         {
            
             try
@@ -109,7 +106,7 @@ namespace IDF_Database
             }
             catch (COMException)
             {
-                MessageBox.Show("Could not process files due to one or more being open. Please close all excel documents and restart program.", "Important Message");
+                MessageBox.Show("Could not open " + filename + ". Please close make sure it is not open in another window." , "Important Message");
                 
             }
            
@@ -129,7 +126,27 @@ namespace IDF_Database
             }
             catch (FileNotFoundException e)
             {
-                Console.Write(e);
+                MessageBox.Show("Error: File Not Found Exception while trying to get filenames from LABELS", "Important Message");
+            }
+
+            return fileNames;
+        }
+
+        /**
+         * creates fileNames object. called from import data method. 
+         * */
+        private string[] getFileNames(string dir)
+        {
+
+            string[] fileNames = new string[0];
+            try
+            {
+                fileNames = Directory.GetFiles(dir + "/");
+
+            }
+            catch (FileNotFoundException e)
+            {
+                MessageBox.Show("Error: File Not Found Exception while trying to get filenames from " + dir, "Important Message");
             }
 
             return fileNames;
@@ -149,7 +166,7 @@ namespace IDF_Database
                 }
                 catch (IOException)
                 {
-                    MessageBox.Show("Could not process files due to one or more being open. Please close all excel documents and restart program.", "Important Message");
+                    MessageBox.Show("Error trying to move file into read. Make sure the filename " + fileName + " is not being used by another file in READ folder.", "Important Message");
                 }
 
             }
@@ -238,29 +255,24 @@ namespace IDF_Database
 
                 }
                 
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                Marshal.ReleaseComObject(range);
-
-                Marshal.ReleaseComObject(ws);
+                
 
             }
             if (!File.Exists(fileName))
             {
                 wb.SaveAs(fileName);
-                wb.Close();
-                Marshal.ReleaseComObject(wb);
+                cleanExcelProcess();
                 return true;
             }
             else
             {
                 File.Delete(fileName);
                 wb.SaveAs(fileName);
-                wb.Close();
-                Marshal.ReleaseComObject(wb);
+                cleanExcelProcess();
                 return true;
             }
-           
+
+            
         }
 
         /**
@@ -400,6 +412,132 @@ namespace IDF_Database
             return fPP;
         }
         
+        private string[,] formatPP(string[] pp, int height, int width)
+        {
+            string[,] fPP = new string[pp.Length / height, pp.Length / width];
+            int count = 0;
+            for (int i = 0; i < 36; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    fPP[i, j] = (count + 1).ToString() + "||" + pp[count];
+                    count++;
+                }
+            }
+
+            return fPP;
+        }
+
+        private string[,] createCableInvArray()
+        {
+
+            //read worksheet cell by cell and input data into cableInv. 
+            //i and j start at 1 because Cells do not start at 0,0 they start at 1,1 in Excel
+            int numRows = range.Rows.Count;
+            int numCols = range.Columns.Count;
+            string[,] cableInv = new string[numRows, numCols];
+
+            for (int i = 1; i <= numRows; i++)
+            {
+                if (range.Cells[i, 1].Value2 != null)
+                {
+                    for (int j = 1; j <= numCols; j++)
+                    {
+                        if (range.Cells[i, j].Value2 != null)
+                        {
+                            cableInv[i - 1, j - 1] = range.Cells[i, j].Value2.ToString();
+                        }
+                    }
+                }
+            }
+
+            return cableInv;
+
+        }
+
+
+        /**
+         * Opens the cable inventory WB and reassigns ws and range
+         * */
+        private void openCableInventoryExcel()
+        {
+            string[] fileNames = getFileNames("CableInventory");
+
+            //open first workbook in array
+            FileInfo fi;
+            fi = new FileInfo(fileNames[0]);
+            openWorkbook(fi.FullName);
+
+            //create worksheet and range
+            ws = wb.ActiveSheet;
+            range = ws.UsedRange;
+        }
+
+        /**
+         *  This will update Cable Inventory after data import. 
+         * */ 
+         private void updateCableInv(string[][] data)
+        {
+
+            int[] cableInvCount = createCableInvCount();
+
+            //check the first column of each data row for matching string in CableInv[0,i]. If true decriment count in cableInvCount.
+            foreach(string[] row in data)
+            {
+                for (int i = 0; i < cableInv.GetLength(0); i++)
+                {
+                    if (string.Equals(row[0].ToLower(),cableInv[i, 0].ToLower()))
+                    {
+                        cableInvCount[i]--;
+                    }
+                }
+            }
+
+            for (int i = 0; i < cableInv.GetLength(0); i++)
+            {
+                if (cableInvCount[i] > -1000) // if createCableInvCount() was unable to parse string to int it set value to -1000. 
+                {
+                    cableInv[i, 1] = cableInvCount[i].ToString();
+                }
+            }
+
+            
+
+            for (int i = 0; i < cableInv.GetLength(0); i++)
+            {
+                if (cableInv[i,1] != null)
+                {
+                    range.Cells[i+1, 2].Value2 = cableInv[i, 1];
+
+                }
+            }
+
+            wb.Save();
+
+        }
+
+        /**
+         * Creates a one dimensional array of int values. It is parsed from string[,] cableInv. We use cableInvCount to update values on each cable length.
+         * */
+        private int[] createCableInvCount()
+        {
+            int[] cableInvCount = new int[cableInv.GetLength(0)];
+            for (int i = 0; i < cableInv.GetLength(0); i++)
+            {
+                try
+                {
+                    cableInvCount[i] = Int32.Parse(cableInv[i, 1]);
+                }
+                catch (FormatException)
+                {
+                    cableInvCount[i] = -1000; //best way i could think to handle it right now. Create a check when writing over CableInventory file for (< -79) and if true then place original value. Handles non numeric values in cableInv
+                }
+            }
+
+            return cableInvCount;
+
+        }
+        
 
         /**
          * Creates a workbook the number of sheets passed in by parameter.
@@ -416,7 +554,7 @@ namespace IDF_Database
             }
             catch (Exception)
             {
-                Console.Write("Error");
+                MessageBox.Show("Error found while trying to create excel document", "Important Message");
             }
             finally
             {
@@ -427,13 +565,59 @@ namespace IDF_Database
         }
 
         /**
-         * Clean up process
+         * Clean up methods
          * */
+
+        private void cleanExcelProcess()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            try
+            {
+                while (Marshal.ReleaseComObject(range) > 0) ;
+            }
+            catch { }
+            finally
+            {
+                range = null;
+            }
+
+            try
+            {
+                while (Marshal.ReleaseComObject(ws) > 0) ;
+            }
+            catch { }
+            finally
+            {
+                ws = null;
+            }
+
+            try
+            {
+                wb.Close();
+                while (Marshal.ReleaseComObject(wb) > 0) ;
+            }
+            catch { }
+            finally
+            {
+                wb = null;
+            }
+        }
 
         public void closeFM()
         {
             excel.Quit();
-            Marshal.ReleaseComObject(excel);
+            try
+            {
+                while (Marshal.ReleaseComObject(excel) > 0) ;
+            }
+            catch { }
+            finally
+            {
+                excel = null;
+            }
+            
         }
 
 
