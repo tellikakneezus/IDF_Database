@@ -308,19 +308,19 @@ namespace IDF_Database
         private int ppStringToInt(string pp)
         {
             int ppInt = 0;
-
-            switch (pp.ToLower())
+            string ppString = pp.ToLower().Substring(1);
+            switch (ppString)
             {
-                case "02s":
+                case "2s":
                     ppInt = 3;
                     break;
-                case "02n":
+                case "2n":
                     ppInt = 4;
                     break;
-                case "03s":
+                case "3s":
                     ppInt = 5;
                     break;
-                case "03n":
+                case "3n":
                     ppInt = 7;
                     break;
 
