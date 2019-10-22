@@ -3,24 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:IDF_Database"
+        xmlns:local="clr-namespace:IDF_Database" 
         mc:Ignorable="d"
-        Title="IDF Database" Height="450" Width="800" Closing="MainForm_Closing" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Left">
+        Title="HSM Cable Database" Height="450" Width="800" Closing="MainForm_Closing" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Left">
     <Grid>
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="23" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Width="Auto">
             <MenuItem x:Name="FileMenu" Header="File" Height="23" Width="70" IsEnabled="False">
-                <MenuItem x:Name="SaveIdfFile" Header="Save IDF File" Height="23" HorizontalAlignment="Left"  Click="SaveIdfFile_Click">
-                    <MenuItem.Icon>
-                        <Image Source="/resources/NewFile.png"></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
+                <MenuItem x:Name="SaveIdfFile" Header="Save IDF File" Height="23" HorizontalAlignment="Left"  Click="SaveIdfFile_Click"></MenuItem>
+                <MenuItem x:Name="ImportLabels" Header="Import Labels" Height="23" HorizontalAlignment="Left" Click="ImportLabels_Click" ></MenuItem>
                 <MenuItem x:Name="FallbackDatabase" Header="Fallback Database" Height="23" HorizontalAlignment="Left" Click="FallbackDatabase_Click" ></MenuItem>
             </MenuItem>
 
             <MenuItem x:Name="AddMenu" Header="Add" Height="23" Width="70" IsEnabled="False">
                 <MenuItem x:Name="AddIdf" Header="Add IDF" Height="23" Click="AddIdf_Click">
                     <MenuItem.Icon>
-                        <Image Source="./resources/NewFile.png"></Image>
+                        <Image Source=".../resources/NewFile.png"></Image>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -28,7 +25,7 @@
             <MenuItem x:Name="HelpMenu" Header="Help" Height="23" Width="70" IsEnabled="False">
                 <MenuItem x:Name="TutorialMenuItem" Header="Tutorial" Height="23" Click="Tutorial_Click">
                     <MenuItem.Icon>
-                        <Image Source="./resources/NewFile.png"></Image>
+                        <Image Source=".../resources/NewFile.png"></Image>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

@@ -6,6 +6,7 @@ using System.Windows;
 using Timer = System.Timers.Timer;
 using System.ComponentModel;
 
+
 namespace IDF_Database
 {
 
@@ -20,17 +21,20 @@ namespace IDF_Database
 
         enum TutorialStep { Start, Fallback, Spreadsheet, End }; //used to track where user is in tutorial.
         bool tutorialFlag = true; //set when user chooses tutorial option. 
-        
-  
+
+
+     
         
 
         public MainWindow()
-        {            
+        {
+
             initializeFM_IdfDB();
             InitializeComponent();
             enableMenu();
             Tutorial(TutorialStep.Start);                   
         }
+
 
         private void MainForm_Closing(object sender, CancelEventArgs e)
         {
@@ -217,6 +221,9 @@ namespace IDF_Database
             Tutorial(TutorialStep.Start);
         }
 
-       
+        private void ImportLabels_Click(object sender, RoutedEventArgs e)
+        {
+            fm.updateFileManager();
+        }
     }
 }

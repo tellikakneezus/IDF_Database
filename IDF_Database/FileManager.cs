@@ -16,6 +16,7 @@ namespace IDF_Database
         Workbook wb;
         Worksheet ws;
         Range range;
+        Splash splash = new Splash(); // eventually find a way to move to MainWindow.
 
         string[][] dataIn; //
         string[,] cableInv;
@@ -31,19 +32,34 @@ namespace IDF_Database
         {
             excel = new _Excel.Application(); //start excel
 
-            string[] labelFiles = getFileNames("Labels"); //
-            dataIn = processFiles(labelFiles);
+            updateFileManager();
             cleanExcelProcess();
-            excel.Quit();
-            filesRead(labelFiles);
 
-            openCableInventoryExcel();
-            cableInv = createCableInvArray();
-            updateCableInv(dataIn);
-            cleanExcelProcess();
-            
         }
 
+        public void updateFileManager()
+        {
+            splash.Show();
+            splash.changeMessage("Getting Files"); string[] labelFiles = getFileNames("Labels");
+
+            dataIn = processFiles(labelFiles);
+
+            cleanExcelProcess();
+            excel.Quit();
+            splash.changeMessage("Moving files to Read"); filesRead(labelFiles);
+
+
+            splash.changeMessage("Opening Inventory"); openCableInventoryExcel();
+
+            splash.changeMessage("Importing Inventory"); cableInv = createCableInvArray();
+
+
+            splash.changeMessage("Updating Inventory"); updateCableInv(dataIn);
+
+            splash.Hide();
+
+            cleanExcelProcess();
+        }
 
 
         /**
@@ -53,11 +69,14 @@ namespace IDF_Database
         {
             List<string[]> dataList = new List<string[]>();
             FileInfo fi;
-
+            int count = 0;
             foreach (string file in fileNames)
             {
+                count++;
+                splash.changeMessage("Processing Files " + count + " out of " + fileNames.Length + ": " + file);
                 fi = new FileInfo(file);
                 openWorkbook(fi.FullName);
+                
                 ws = wb.ActiveSheet;
                 range = ws.UsedRange;
 
@@ -80,13 +99,8 @@ namespace IDF_Database
                     }
                     dataList.Add(objToStringLine);
                 }
-                //GC.Collect();
-                //GC.WaitForPendingFinalizers();
-                //Marshal.ReleaseComObject(range);
 
-                //Marshal.ReleaseComObject(ws);
-                //wb.Close();
-                //Marshal.ReleaseComObject(wb);
+                
             }
             
            
@@ -229,7 +243,7 @@ namespace IDF_Database
                     startY++; endY += 8;
 
                     //number of divisions per PP
-                    int divisions = 4;
+                    int divisions = 1;
 
                     //Reformat pp data and add to spreadsheet
                     string[,] inputData = formatPP(allIdfData[i][j]);
@@ -437,19 +451,28 @@ namespace IDF_Database
             int numCols = range.Columns.Count;
             string[,] cableInv = new string[numRows, numCols];
 
-            for (int i = 1; i <= numRows; i++)
+            object[,] importArray = range.Cells.Value2;
+            for (int i = 0; i <numRows; i++)
             {
-                if (range.Cells[i, 1].Value2 != null)
+                for (int j = 0; j < numCols; j++)
                 {
-                    for (int j = 1; j <= numCols; j++)
-                    {
-                        if (range.Cells[i, j].Value2 != null)
-                        {
-                            cableInv[i - 1, j - 1] = range.Cells[i, j].Value2.ToString();
-                        }
-                    }
+                    if (importArray[i+1, j + 1] != null) cableInv[i,j] = importArray[i+1, j + 1].ToString(); else cableInv[i, j] = "";
                 }
+
             }
+            //for (int i = 1; i <= numRows; i++)
+            //{
+            //    if (range.Cells[i, 1].Value2 != null)
+            //    {
+            //        for (int j = 1; j <= numCols; j++)
+            //        {
+            //            if (range.Cells[i, j].Value2 != null)
+            //            {
+            //                cableInv[i - 1, j - 1] = range.Cells[i, j].Value2.ToString();
+            //            }
+            //        }
+            //    }
+            //}
 
             return cableInv;
 
@@ -513,6 +536,7 @@ namespace IDF_Database
             }
 
             wb.Save();
+            
 
         }
 
@@ -607,6 +631,7 @@ namespace IDF_Database
 
         public void closeFM()
         {
+
             excel.Quit();
             try
             {
