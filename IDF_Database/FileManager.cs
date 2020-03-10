@@ -67,7 +67,8 @@ namespace IDF_Database
          * */
         private string[][] processFiles(string[] fileNames)
         {
-            List<string[]> dataList = new List<string[]>();
+            List<string[]> dataList = new List<string[]>(); //holds all data imported from label spreadsheets
+            
             FileInfo fi;
             int count = 0;
             foreach (string file in fileNames)
@@ -86,17 +87,23 @@ namespace IDF_Database
                 int numRows = range.Rows.Count;
                 int numCols = range.Columns.Count;
                 object[,] importArray = range.Cells.Value2;
-                for(int i = 1; i <= numRows; i++)
+                string[] objToStringLine;
+                for (int i = 1; i <= numRows; i++)
                 {
                     if(importArray[i,1] == null && importArray[i,2] == null)
                     {
-                        break;
+                        break; //if nothing is in n column on row, go to next line
                     }
-                    string[] objToStringLine = new string[numCols];
-                    for(int j = 0; j < numCols; j++)
+                    else
                     {
-                        if (importArray[i, j + 1] != null) objToStringLine[j] = importArray[i, j + 1].ToString(); else objToStringLine[j] = "";
+                        objToStringLine = new string[numCols];
+                        for (int j = 0; j < numCols; j++)
+                        {
+                            if (importArray[i, j + 1] != null) objToStringLine[j] = importArray[i, j + 1].ToString(); else objToStringLine[j] = "";
+                        }
                     }
+                      
+                    
                     dataList.Add(objToStringLine);
                 }
 
@@ -418,6 +425,7 @@ namespace IDF_Database
             {
                 for(int j = 0; j < 8; j++)
                 {
+                    
                     fPP[i, j] = (count+1).ToString() + "||" + pp[count];
                     count++;
                 }
@@ -460,19 +468,7 @@ namespace IDF_Database
                 }
 
             }
-            //for (int i = 1; i <= numRows; i++)
-            //{
-            //    if (range.Cells[i, 1].Value2 != null)
-            //    {
-            //        for (int j = 1; j <= numCols; j++)
-            //        {
-            //            if (range.Cells[i, j].Value2 != null)
-            //            {
-            //                cableInv[i - 1, j - 1] = range.Cells[i, j].Value2.ToString();
-            //            }
-            //        }
-            //    }
-            //}
+          
 
             return cableInv;
 
@@ -507,13 +503,17 @@ namespace IDF_Database
             //check the first column of each data row for matching string in CableInv[0,i]. If true decriment count in cableInvCount.
             foreach(string[] row in data)
             {
-                for (int i = 0; i < cableInv.GetLength(0); i++)
+                if(row != null)
                 {
-                    if (string.Equals(row[0].ToLower(),cableInv[i, 0].ToLower()))
+                    for (int i = 0; i < cableInv.GetLength(0); i++)
                     {
-                        cableInvCount[i]--;
+                        if (string.Equals(row[0].ToLower(), cableInv[i, 0].ToLower()))
+                        {
+                            cableInvCount[i]--;
+                        }
                     }
                 }
+                
             }
 
             for (int i = 0; i < cableInv.GetLength(0); i++)

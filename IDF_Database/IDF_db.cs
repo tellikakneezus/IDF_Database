@@ -84,21 +84,35 @@ namespace IDF_Database
         {
             foreach(string[] info in data)
             {
-                int i = isIdfCable(info[1]);
-                
-                if (i != -1)
+                if(info != null)
                 {
-                    string idf = info[1].Substring(0, 3).ToLower();
-                    string ppInIDF = info[1].Substring(3, 3).ToLower();
-                    string infoOut = info[3] + ", " + info[2] + " | " + info[5] + ", " + info[4];
-                    int portInPP;
-                    if(int.TryParse(info[1].Substring(6), out portInPP)) // returns false if info[1] starting at char6 cannot be converted to int and will not try to insert data. 
+                    int i = isIdfCable(info[1]);
+
+                    if (i != -1)
                     {
-                        idfs[i].insertData(ppInIDF, portInPP, infoOut);
-                        //need to update complimenting pp.
-                        idfs[getIdfIndex(ppInIDF)].insertData(idf, portInPP, infoOut);
+                        string idf = info[1].Substring(0, 3).ToLower();
+                        string ppInIDF = info[1].Substring(3, 3).ToLower();
+                        string infoOut;
+                        if (info[2] != "") //user is not trying to blank out port. 
+
+                        {
+                            infoOut = info[3] + ", " + info[2] + " | " + info[5] + ", " + info[4];
+                        }
+                        else
+                        {
+                            infoOut = "";
+                        }
+                        
+                        int portInPP;
+                        if (int.TryParse(info[1].Substring(6), out portInPP)) // returns false if info[1] starting at char6 cannot be converted to int and will not try to insert data. 
+                        {
+                            idfs[i].insertData(ppInIDF, portInPP, infoOut);
+                            //need to update complimenting pp.
+                            idfs[getIdfIndex(ppInIDF)].insertData(idf, portInPP, infoOut);
+                        }
                     }
                 }
+               
             }
            
         }

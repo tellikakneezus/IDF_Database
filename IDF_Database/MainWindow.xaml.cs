@@ -224,6 +224,7 @@ namespace IDF_Database
         private void ImportLabels_Click(object sender, RoutedEventArgs e)
         {
             fm.updateFileManager();
+            idfDB.insertData(fm.getDataIn());
         }
     }
 }
