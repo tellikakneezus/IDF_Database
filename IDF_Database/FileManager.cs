@@ -48,13 +48,15 @@ namespace IDF_Database
             excel.Quit();
             splash.changeMessage("Moving files to Read"); filesRead(labelFiles);
 
+            #region inventory logic. Deleting
+            //splash.changeMessage("Opening Inventory"); openCableInventoryExcel();
 
-            splash.changeMessage("Opening Inventory"); openCableInventoryExcel();
-
-            splash.changeMessage("Importing Inventory"); cableInv = createCableInvArray();
+            //splash.changeMessage("Importing Inventory"); cableInv = createCableInvArray();
 
 
-            splash.changeMessage("Updating Inventory"); updateCableInv(dataIn);
+            //splash.changeMessage("Updating Inventory"); updateCableInv(dataIn);
+            #endregion
+
 
             splash.Hide();
 
@@ -450,118 +452,120 @@ namespace IDF_Database
             return fPP;
         }
 
-        private string[,] createCableInvArray()
-        {
+        #region Cable Inventory Logic. Deleting
+        //private string[,] createCableInvArray()
+        //{
 
-            //read worksheet cell by cell and input data into cableInv. 
-            //i and j start at 1 because Cells do not start at 0,0 they start at 1,1 in Excel
-            int numRows = range.Rows.Count;
-            int numCols = range.Columns.Count;
-            string[,] cableInv = new string[numRows, numCols];
+        //    //read worksheet cell by cell and input data into cableInv. 
+        //    //i and j start at 1 because Cells do not start at 0,0 they start at 1,1 in Excel
+        //    int numRows = range.Rows.Count;
+        //    int numCols = range.Columns.Count;
+        //    string[,] cableInv = new string[numRows, numCols];
 
-            object[,] importArray = range.Cells.Value2;
-            for (int i = 0; i <numRows; i++)
-            {
-                for (int j = 0; j < numCols; j++)
-                {
-                    if (importArray[i+1, j + 1] != null) cableInv[i,j] = importArray[i+1, j + 1].ToString(); else cableInv[i, j] = "";
-                }
+        //    object[,] importArray = range.Cells.Value2;
+        //    for (int i = 0; i <numRows; i++)
+        //    {
+        //        for (int j = 0; j < numCols; j++)
+        //        {
+        //            if (importArray[i+1, j + 1] != null) cableInv[i,j] = importArray[i+1, j + 1].ToString(); else cableInv[i, j] = "";
+        //        }
 
-            }
+        //    }
           
 
-            return cableInv;
+        //    return cableInv;
 
-        }
+        //}
 
 
-        /**
-         * Opens the cable inventory WB and reassigns ws and range
-         * */
-        private void openCableInventoryExcel()
-        {
-            string[] fileNames = getFileNames("CableInventory");
+        ///**
+        // * Opens the cable inventory WB and reassigns ws and range
+        // * */
+        //private void openCableInventoryExcel()
+        //{
+        //    string[] fileNames = getFileNames("CableInventory");
 
-            //open first workbook in array
-            FileInfo fi;
-            fi = new FileInfo(fileNames[0]);
-            openWorkbook(fi.FullName);
+        //    //open first workbook in array
+        //    FileInfo fi;
+        //    fi = new FileInfo(fileNames[0]);
+        //    openWorkbook(fi.FullName);
 
-            //create worksheet and range
-            ws = wb.ActiveSheet;
-            range = ws.UsedRange;
-        }
+        //    //create worksheet and range
+        //    ws = wb.ActiveSheet;
+        //    range = ws.UsedRange;
+        //}
 
-        /**
-         *  This will update Cable Inventory after data import. 
-         * */ 
-         private void updateCableInv(string[][] data)
-        {
+        ///**
+        // *  This will update Cable Inventory after data import. 
+        // * */ 
+        // private void updateCableInv(string[][] data)
+        //{
 
-            int[] cableInvCount = createCableInvCount();
+        //    int[] cableInvCount = createCableInvCount();
 
-            //check the first column of each data row for matching string in CableInv[0,i]. If true decriment count in cableInvCount.
-            foreach(string[] row in data)
-            {
-                if(row != null)
-                {
-                    for (int i = 0; i < cableInv.GetLength(0); i++)
-                    {
-                        if (string.Equals(row[0].ToLower(), cableInv[i, 0].ToLower()))
-                        {
-                            cableInvCount[i]--;
-                        }
-                    }
-                }
+        //    //check the first column of each data row for matching string in CableInv[0,i]. If true decriment count in cableInvCount.
+        //    foreach(string[] row in data)
+        //    {
+        //        if(row != null)
+        //        {
+        //            for (int i = 0; i < cableInv.GetLength(0); i++)
+        //            {
+        //                if (string.Equals(row[0].ToLower(), cableInv[i, 0].ToLower()))
+        //                {
+        //                    cableInvCount[i]--;
+        //                }
+        //            }
+        //        }
                 
-            }
+        //    }
 
-            for (int i = 0; i < cableInv.GetLength(0); i++)
-            {
-                if (cableInvCount[i] > -1000) // if createCableInvCount() was unable to parse string to int it set value to -1000. 
-                {
-                    cableInv[i, 1] = cableInvCount[i].ToString();
-                }
-            }
+        //    for (int i = 0; i < cableInv.GetLength(0); i++)
+        //    {
+        //        if (cableInvCount[i] > -1000) // if createCableInvCount() was unable to parse string to int it set value to -1000. 
+        //        {
+        //            cableInv[i, 1] = cableInvCount[i].ToString();
+        //        }
+        //    }
 
             
 
-            for (int i = 0; i < cableInv.GetLength(0); i++)
-            {
-                if (cableInv[i,1] != null)
-                {
-                    range.Cells[i+1, 2].Value2 = cableInv[i, 1];
+        //    for (int i = 0; i < cableInv.GetLength(0); i++)
+        //    {
+        //        if (cableInv[i,1] != null)
+        //        {
+        //            range.Cells[i+1, 2].Value2 = cableInv[i, 1];
 
-                }
-            }
+        //        }
+        //    }
 
-            wb.Save();
+        //    wb.Save();
             
 
-        }
+        //}
 
-        /**
-         * Creates a one dimensional array of int values. It is parsed from string[,] cableInv. We use cableInvCount to update values on each cable length.
-         * */
-        private int[] createCableInvCount()
-        {
-            int[] cableInvCount = new int[cableInv.GetLength(0)];
-            for (int i = 0; i < cableInv.GetLength(0); i++)
-            {
-                try
-                {
-                    cableInvCount[i] = Int32.Parse(cableInv[i, 1]);
-                }
-                catch (FormatException)
-                {
-                    cableInvCount[i] = -1000; //best way i could think to handle it right now. Create a check when writing over CableInventory file for (< -79) and if true then place original value. Handles non numeric values in cableInv
-                }
-            }
+        ///**
+        // * Creates a one dimensional array of int values. It is parsed from string[,] cableInv. We use cableInvCount to update values on each cable length.
+        // * */
+        //private int[] createCableInvCount()
+        //{
+        //    int[] cableInvCount = new int[cableInv.GetLength(0)];
+        //    for (int i = 0; i < cableInv.GetLength(0); i++)
+        //    {
+        //        try
+        //        {
+        //            cableInvCount[i] = Int32.Parse(cableInv[i, 1]);
+        //        }
+        //        catch (FormatException)
+        //        {
+        //            cableInvCount[i] = -1000; //best way i could think to handle it right now. Create a check when writing over CableInventory file for (< -79) and if true then place original value. Handles non numeric values in cableInv
+        //        }
+        //    }
 
-            return cableInvCount;
+        //    return cableInvCount;
 
-        }
-        
+        //}
+
+        #endregion 
 
         /**
          * Creates a workbook the number of sheets passed in by parameter.
